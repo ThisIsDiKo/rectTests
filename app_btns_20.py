@@ -17,7 +17,7 @@ class Example(QWidget):
 
     def initUI(self):
 
-        self.rows = 1
+        self.rows = 3
         self.cols = 3
 
         self.curState = []
@@ -27,10 +27,10 @@ class Example(QWidget):
             t = []
             for j in range(self.cols):
                 t.append(0)
-            self.nextState.append(t)
+            self.curState.append(t)
 
         self.setWindowTitle('Artnet tester')
-        #self.resize(900, 900)
+        self.resize(400, 400)
 
         self.testCBox = QComboBox()
         self.testCBox.addItem(QIcon("img1.bmp"), "item1")
@@ -58,7 +58,18 @@ class Example(QWidget):
 
 
         self.timingText = QLineEdit()
-        self.timingText.setText(1000)
+        self.timingText.setText("1000")
+
+        self.btnDropDown = QPushButton("DROP DOWN")
+        self.btnDropDown.clicked.connect(self.animate_drop_down)
+        self.btnConer = QPushButton("CONER")
+        self.btnConer.clicked.connect(self.animate_coner)
+        self.btnSnake = QPushButton("SNAKE")
+        self.btnSnake.clicked.connect(self.animate_snake)
+        self.hboxAnimate = QHBoxLayout()
+        self.hboxAnimate.addWidget(self.timingText)
+        self.hboxAnimate.addWidget(self.btnDropDown)
+
 
 
 
@@ -77,6 +88,7 @@ class Example(QWidget):
         self.vBoxL.addLayout(self.hBoxL)
         self.vBoxL.addLayout(self.gridL)
         self.vBoxL.addWidget(self.btnSend)
+        self.vBoxL.addLayout(self.hboxAnimate)
         self.setLayout(self.vBoxL)
         self.show()
 
@@ -91,12 +103,14 @@ class Example(QWidget):
             t = []
             for j in range(self.cols):
                 t.append(self.nextState[i][j])
-                if self.nextState[i][j] != -1:
-                    l.append(self.nextState[i][j])
             self.curState.append(t)
 
+        l = self.serialize_cur_data()
+
         print(l)
-        self.send_data(l)
+        print(self.curState)
+        print(self.nextState)
+        #self.send_data(l)
 
 
     def btnSetAll_clicked(self):
@@ -121,11 +135,25 @@ class Example(QWidget):
         data = part1 + part2 + part3
         self.sock.sendto(data, self.addr)
 
-    def animate_drop_down(self):
-        delay = int(self.timingText.text())
+    def serialize_cur_data(self):
+        l = []
         for i in range(self.rows):
             for j in range(self.cols):
-                pass
+                if self.curState[i][j] != -1:
+                    l.append(self.curState[i][j])
+        return l
+
+    def animate_drop_down(self):
+        delay = int(self.timingText.text())
+        self.prep_data()
+        print(self.nextState)
+        print(self.curState)
+        for i in range(self.rows):
+            for j in range(self.cols):
+                self.curState[i][j] = self.nextState[i][j]
+            l = self.serialize_cur_data()
+            print(l)
+            time.sleep(delay/1000)
 
     def animate_slide_LR(self):
         pass
