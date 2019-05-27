@@ -62,13 +62,27 @@ class Example(QWidget):
 
         self.btnDropDown = QPushButton("DROP DOWN")
         self.btnDropDown.clicked.connect(self.animate_drop_down)
-        self.btnConer = QPushButton("CONER")
-        self.btnConer.clicked.connect(self.animate_coner)
+        self.btnCorner = QPushButton("CORNER")
+        self.btnCorner.clicked.connect(self.animate_corner)
         self.btnSnake = QPushButton("SNAKE")
         self.btnSnake.clicked.connect(self.animate_snake)
         self.hboxAnimate = QHBoxLayout()
         self.hboxAnimate.addWidget(self.timingText)
         self.hboxAnimate.addWidget(self.btnDropDown)
+        self.hboxAnimate.addWidget(self.btnCorner)
+        self.hboxAnimate.addWidget(self.btnSnake)
+
+
+        self.btnLR = QPushButton("LEFT RIGHT")
+        self.btnLR.clicked.connect(self.animate_slide_LR)
+        self.btnSerial = QPushButton("SERIAL")
+        self.btnSerial.clicked.connect(self.animate_serial)
+        self.btnCenter = QPushButton("CENTER")
+        self.btnCenter.clicked.connect(self.animate_center)
+        self.hboxAnimate2 = QHBoxLayout()
+        self.hboxAnimate2.addWidget(self.btnLR)
+        self.hboxAnimate2.addWidget(self.btnSerial)
+        self.hboxAnimate2.addWidget(self.btnCenter)
 
 
 
@@ -89,10 +103,11 @@ class Example(QWidget):
         self.vBoxL.addLayout(self.gridL)
         self.vBoxL.addWidget(self.btnSend)
         self.vBoxL.addLayout(self.hboxAnimate)
+        self.vBoxL.addLayout(self.hboxAnimate2)
         self.setLayout(self.vBoxL)
         self.show()
 
-        self.sock  = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     def btnSend_clicked(self):
         l = []
@@ -110,7 +125,7 @@ class Example(QWidget):
         print(l)
         print(self.curState)
         print(self.nextState)
-        #self.send_data(l)
+        self.send_data(l)
 
 
     def btnSetAll_clicked(self):
@@ -133,7 +148,9 @@ class Example(QWidget):
         part2 = b'\x00\x00\x00\x00\x02\x00'
         part3 = bytes(l)
         data = part1 + part2 + part3
-        self.sock.sendto(data, self.addr)
+        if self.sock:
+            self.sock.sendto(data, self.addr)
+        print("data sent")
 
     def serialize_cur_data(self):
         l = []
@@ -152,23 +169,74 @@ class Example(QWidget):
             for j in range(self.cols):
                 self.curState[i][j] = self.nextState[i][j]
             l = self.serialize_cur_data()
+            self.send_data(l)
             print(l)
             time.sleep(delay/1000)
 
     def animate_slide_LR(self):
-        pass
+        delay = int(self.timingText.text())
+        self.prep_data()
+        print(self.nextState)
+        print(self.curState)
+        for col in range(self.cols):
+            for row in range(self.rows):
+                self.curState[row][col] = self.nextState[row][col]
+            l = self.serialize_cur_data()
+            self.send_data(l)
+            print(l)
+            time.sleep(delay / 1000)
 
     def animate_slide_RL(self):
         pass
 
     def animate_snake(self):
-        pass
+        delay = int(self.timingText.text())
+        self.prep_data()
+        print(self.nextState)
+        print(self.curState)
+        for row in range(self.rows):
+            if row % 2 == 0:
+                for col in range(self.cols-1, -1, -1):
+                    self.curState[row][col] = self.nextState[row][col]
+                    l = self.serialize_cur_data()
+                    self.send_data(l)
+                    print(l)
+                    time.sleep(delay / 1000)
+            else:
+                for col in range(self.cols):
+                    self.curState[row][col] = self.nextState[row][col]
+                    l = self.serialize_cur_data()
+                    self.send_data(l)
+                    print(l)
+                    time.sleep(delay / 1000)
 
     def animate_serial(self):
-        pass
+        delay = int(self.timingText.text())
+        self.prep_data()
+        print(self.nextState)
+        print(self.curState)
+        for row in range(self.rows):
+            for col in range(self.cols):
+                self.curState[row][col] = self.nextState[row][col]
+                l = self.serialize_cur_data()
+                self.send_data(l)
+                print(l)
+                time.sleep(delay / 1000)
+
 
     def animate_corner(self):
-        pass
+        delay = int(self.timingText.text())
+        self.prep_data()
+        print(self.nextState)
+        print(self.curState)
+        for row in range(self.rows):
+            for row2 in range(row + 1):
+                for col in range(row + 1):
+                    self.curState[row2][col] = self.nextState[row2][col]
+            l = self.serialize_cur_data()
+            self.send_data(l)
+            print(l)
+            time.sleep(delay / 1000)
 
     def animate_center(self):
         pass
@@ -177,6 +245,7 @@ class Example(QWidget):
         # do stuff
         if self.sock:
             self.sock.close()  # let the window close
+            print("socket closed")
 
 
 if __name__ == '__main__':
