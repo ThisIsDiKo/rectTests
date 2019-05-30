@@ -13,6 +13,7 @@ class Example(QWidget):
         self.addr  = ("192.168.0.222", 6454)
         self.curTiming = 0
         self.initUI()
+        self.file = open("demo.csv", "w")
 
 
     def initUI(self):
@@ -84,6 +85,8 @@ class Example(QWidget):
         self.hboxAnimate2.addWidget(self.btnSerial)
         self.hboxAnimate2.addWidget(self.btnCenter)
 
+        self.timingWrite = QLineEdit("0")
+
 
 
 
@@ -104,6 +107,7 @@ class Example(QWidget):
         self.vBoxL.addWidget(self.btnSend)
         self.vBoxL.addLayout(self.hboxAnimate)
         self.vBoxL.addLayout(self.hboxAnimate2)
+        self.vBoxL.addWidget(self.timingWrite)
         self.setLayout(self.vBoxL)
         self.show()
 
@@ -122,6 +126,8 @@ class Example(QWidget):
 
         l = self.serialize_cur_data()
 
+        self.curTiming = int(self.timingWrite.text())
+        self.write_to_file(self.curTiming, l)
         print(l)
         print(self.curState)
         print(self.nextState)
@@ -162,6 +168,7 @@ class Example(QWidget):
 
     def animate_drop_down(self):
         delay = int(self.timingText.text())
+        self.curTiming = int(self.timingWrite.text())
         self.prep_data()
         print(self.nextState)
         print(self.curState)
@@ -169,12 +176,14 @@ class Example(QWidget):
             for j in range(self.cols):
                 self.curState[i][j] = self.nextState[i][j]
             l = self.serialize_cur_data()
-            self.send_data(l)
-            print(l)
-            time.sleep(delay/1000)
+
+            self.write_to_file(self.curTiming, l)
+            self.curTiming += delay
 
     def animate_slide_LR(self):
         delay = int(self.timingText.text())
+        self.curTiming = int(self.timingWrite.text())
+
         self.prep_data()
         print(self.nextState)
         print(self.curState)
@@ -182,15 +191,16 @@ class Example(QWidget):
             for row in range(self.rows):
                 self.curState[row][col] = self.nextState[row][col]
             l = self.serialize_cur_data()
-            self.send_data(l)
-            print(l)
-            time.sleep(delay / 1000)
+
+            self.write_to_file(self.curTiming, l)
+            self.curTiming += delay
 
     def animate_slide_RL(self):
         pass
 
     def animate_snake(self):
         delay = int(self.timingText.text())
+        self.curTiming = int(self.timingWrite.text())
         self.prep_data()
         print(self.nextState)
         print(self.curState)
@@ -199,19 +209,18 @@ class Example(QWidget):
                 for col in range(self.cols-1, -1, -1):
                     self.curState[row][col] = self.nextState[row][col]
                     l = self.serialize_cur_data()
-                    self.send_data(l)
-                    print(l)
-                    time.sleep(delay / 1000)
+                    self.write_to_file(self.curTiming, l)
+                    self.curTiming += delay
             else:
                 for col in range(self.cols):
                     self.curState[row][col] = self.nextState[row][col]
                     l = self.serialize_cur_data()
-                    self.send_data(l)
-                    print(l)
-                    time.sleep(delay / 1000)
+                    self.write_to_file(self.curTiming, l)
+                    self.curTiming += delay
 
     def animate_serial(self):
         delay = int(self.timingText.text())
+        self.curTiming = int(self.timingWrite.text())
         self.prep_data()
         print(self.nextState)
         print(self.curState)
@@ -219,13 +228,13 @@ class Example(QWidget):
             for col in range(self.cols):
                 self.curState[row][col] = self.nextState[row][col]
                 l = self.serialize_cur_data()
-                self.send_data(l)
-                print(l)
-                time.sleep(delay / 1000)
+                self.write_to_file(self.curTiming, l)
+                self.curTiming += delay
 
 
     def animate_corner(self):
         delay = int(self.timingText.text())
+        self.curTiming = int(self.timingWrite.text())
         self.prep_data()
         print(self.nextState)
         print(self.curState)
@@ -234,15 +243,23 @@ class Example(QWidget):
                 for col in range(row + 1):
                     self.curState[row2][col] = self.nextState[row2][col]
             l = self.serialize_cur_data()
-            self.send_data(l)
-            print(l)
-            time.sleep(delay / 1000)
+            self.write_to_file(self.curTiming, l)
+            self.curTiming += delay
 
     def animate_center(self):
         pass
 
+    def write_to_file(self, timing, data):
+        self.file.write("%d;" % timing)
+        self.file.write(str(data[0]))
+        for i in range(1, len(data)):
+            self.file.write(",%d" % data[i])
+        self.file.write('\n')
+
+
     def closeEvent(self, event):
         # do stuff
+        self.file.close()
         if self.sock:
             self.sock.close()  # let the window close
             print("socket closed")
