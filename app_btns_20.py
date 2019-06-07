@@ -45,13 +45,13 @@ class Example(QWidget):
         self.listOfCBox = []
 
         self.setAllCBox = QComboBox()
-        self.setAllCBox.addItems([str(i) for i in range(20)])
+        self.setAllCBox.addItems([str(i) for i in range(61)])
 
         for i in range(self.rows):
             tL = []
             for j in range(self.cols):
                 cBox = QComboBox()
-                cBox.addItems([str(i) for i in range(-1, 20)])
+                cBox.addItems([str(i) for i in range(-1, 61)])
                 cBox.setCurrentText("0")
                 tL.append(cBox)
             self.listOfCBox.append(tL)
