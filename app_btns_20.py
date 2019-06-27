@@ -47,6 +47,9 @@ class Example(QWidget):
         self.setAllCBox = QComboBox()
         self.setAllCBox.addItems([str(i) for i in range(61)])
 
+        self.btnTest = QPushButton("TEST")
+        self.btnTest.clicked.connect(self.btnTest_clicked)
+
         for i in range(self.rows):
             tL = []
             for j in range(self.cols):
@@ -104,10 +107,28 @@ class Example(QWidget):
         self.vBoxL.addWidget(self.btnSend)
         self.vBoxL.addLayout(self.hboxAnimate)
         self.vBoxL.addLayout(self.hboxAnimate2)
+        self.vBoxL.addWidget(self.btnTest)
         self.setLayout(self.vBoxL)
         self.show()
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+    def btnTest_clicked(self):
+        l = [5 for i in range(9)]
+
+        self.send_data(l)
+
+        time.sleep(4)
+
+        l = [15 for i in range(9)]
+
+        self.send_data(l)
+
+        time.sleep(5)
+
+        l = [0 for i in range(9)]
+
+        self.send_data(l)
 
     def btnSend_clicked(self):
         l = []
