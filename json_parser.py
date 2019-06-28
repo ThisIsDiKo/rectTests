@@ -224,6 +224,14 @@ class Scenario:
                                          self.slides[slideNum]['animation']['direction'],
                                          (minRow, minCol),
                                          (maxRow, maxCol))
+            elif self.slides[slideNum]['animation']['type'] == 'wave':
+                self.wave_animation(self.slides[slideNum-1]['images'],
+                                         self.slides[slideNum]['images'],
+                                         self.slides[slideNum]['timecode'],
+                                         self.slides[slideNum]['animation']['time'],
+                                         self.slides[slideNum]['animation']['direction'],
+                                         (minRow, minCol),
+                                         (maxRow, maxCol))
 
     def prepare_serial_data(self, time, array):
         serialList = []
@@ -312,16 +320,76 @@ class Scenario:
         stepDict = {}
         stepArray = prevSlide[:]
 
-        if direction == "lt_coner":
-            for row in range(startRow, endRow + 1):
-                for col in range(startCol, endCol + 1):
-                    stepArray[row][col] = nessSlide[row][col]
+        mostDirection = True #for horizontal
 
-                stepDict['time'] = time
-                time += timeStep
-                stepDict['images'] = stepArray
+        if direction == "lt_conner":
+            if (endRow - startRow) > (endCol - startCol):
+                mostDirection = False
+                print("vertical direction")
+            else:
+                mostDirection = True
+                print("horizontal direction")
 
-                stepsList.append(copy.deepcopy(stepDict))
+            if mostDirection:
+                for col in range(startCol, endCol+1):
+                    for col1 in range(col+1):
+                        for row1 in range(col+1):
+                            if row1 <= endRow and row1 >= startRow:
+                                stepArray[row1][col1] = nessSlide[row1][col1]
+                    stepDict['time'] = time
+                    time += timeStep
+                    stepDict['images'] = stepArray
+
+                    stepsList.append(copy.deepcopy(stepDict))
+            else:
+                for row in range(startRow, endRow + 1):
+                    for row1 in range(row + 1):
+                        for col1 in range(row + 1):
+                            if col1 <= endCol and col1 >= startCol:
+                                stepArray[row1][col1] = nessSlide[row1][col1]
+                    stepDict['time'] = time
+                    time += timeStep
+                    stepDict['images'] = stepArray
+
+                    stepsList.append(copy.deepcopy(stepDict))
+        elif direction == "rt_conner":
+            if (endRow - startRow) > (endCol - startCol):
+                mostDirection = False
+                print("vertical direction")
+            else:
+                mostDirection = True
+                print("horizontal direction")
+
+            if mostDirection:
+                for col in range(endCol, startCol-1, -1):
+                    for col1 in range(endCol, col-1, -1):
+                        for row1 in range((col-endCol)+1):
+                            if row1 <= endRow and row1 >= startRow:
+                                stepArray[row1][col1] = nessSlide[row1][col1]
+                    stepDict['time'] = time
+                    time += timeStep
+                    stepDict['images'] = stepArray
+
+                    stepsList.append(copy.deepcopy(stepDict))
+            else:
+                for row in range(startRow, endRow + 1):
+                    for row1 in range(row + 1):
+                        for col1 in range(row + 1):
+                            if col1 <= endCol and col1 >= startCol:
+                                stepArray[row1][col1] = nessSlide[row1][col1]
+                    stepDict['time'] = time
+                    time += timeStep
+                    stepDict['images'] = stepArray
+
+                    stepsList.append(copy.deepcopy(stepDict))
+
+        print("------------------------------------------")
+        for step in stepsList:
+            print("timing: {}".format(step['time']))
+            for row in step['images']:
+                print(row)
+            print("------------------------------------------")
+
 
     def snake_animation(self, prevSlide, nessSlide, startTime, timeStep, direction, startPos, endPos):
         startRow, startCol = startPos
