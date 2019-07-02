@@ -515,10 +515,10 @@
       ],
       "animation":[  
          {  
-            "type":"1",
+            "type":"2",
             "time":"200",
             "rpm":"0",
-            "direction1":"1"
+            "direction2":"1"
          }
       ]
    },
@@ -783,7 +783,7 @@
             "type":"2",
             "time":"200",
             "rpm":"0",
-            "direction2":"1"
+            "direction2":"2"
          }
       ]
    },
@@ -1045,10 +1045,10 @@
       ],
       "animation":[
          {
-            "type":"1",
+            "type":"2",
             "time":"200",
             "rpm":"0",
-            "direction1":"3"
+            "direction2":"2"
          }
       ]
    }

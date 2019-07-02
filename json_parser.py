@@ -149,9 +149,9 @@ class Scenario:
                     elif anim_direction == '2':
                         anim_direction = 'rt_conner'
                     elif anim_direction == '3':
-                        anim_direction = 'ld_conner'
+                        anim_direction = 'lb_conner'
                     elif anim_direction == '4':
-                        anim_direction = 'rd_conner'
+                        anim_direction = 'rb_conner'
                     elif anim_direction == '5':
                         anim_direction = 'center'
                 except:
@@ -332,8 +332,9 @@ class Scenario:
 
             if mostDirection:
                 for col in range(startCol, endCol+1):
-                    for col1 in range(col+1):
-                        for row1 in range(col+1):
+                    for col1 in range(startCol, col+1):
+                        for row1 in range(startRow, startRow+col-startCol+1):
+                            print(col, col1, row1)
                             if row1 <= endRow and row1 >= startRow:
                                 stepArray[row1][col1] = nessSlide[row1][col1]
                     stepDict['time'] = time
@@ -352,6 +353,7 @@ class Scenario:
                     stepDict['images'] = stepArray
 
                     stepsList.append(copy.deepcopy(stepDict))
+
         elif direction == "rt_conner":
             if (endRow - startRow) > (endCol - startCol):
                 mostDirection = False
@@ -359,11 +361,13 @@ class Scenario:
             else:
                 mostDirection = True
                 print("horizontal direction")
-
+            """
             if mostDirection:
                 for col in range(endCol, startCol-1, -1):
+                    print(col, end=' -- ')
                     for col1 in range(endCol, col-1, -1):
-                        for row1 in range((col-endCol)+1):
+                        print(col1, end=' ++ \n')
+                        for row1 in range((col1-col)+1):
                             if row1 <= endRow and row1 >= startRow:
                                 stepArray[row1][col1] = nessSlide[row1][col1]
                     stepDict['time'] = time
@@ -374,7 +378,91 @@ class Scenario:
             else:
                 for row in range(startRow, endRow + 1):
                     for row1 in range(row + 1):
-                        for col1 in range(row + 1):
+                        for col1 in range(endCol, row-1, -1):
+                            if col1 <= endCol and col1 >= startCol:
+                                stepArray[row1][col1] = nessSlide[row1][col1]
+                    stepDict['time'] = time
+                    time += timeStep
+                    stepDict['images'] = stepArray
+
+                    stepsList.append(copy.deepcopy(stepDict))
+            """
+            if mostDirection:
+                for col in range(endCol, startCol - 1, -1):
+                    for col1 in range(endCol, col - 1, -1):
+                        for row1 in range(startRow, startRow+(endCol - col) + 1):
+                            if row1 <= endRow and row1 >= startRow:
+                                stepArray[row1][col1] = nessSlide[row1][col1]
+                    stepDict['time'] = time
+                    time += timeStep
+                    stepDict['images'] = stepArray
+
+                    stepsList.append(copy.deepcopy(stepDict))
+            else:
+                for row in range(startRow, endRow + 1):
+                    for row1 in range(row + 1):
+                        for col1 in range(endCol, endCol - row - 1, -1):
+                            if col1 <= endCol and col1 >= startCol:
+                                stepArray[row1][col1] = nessSlide[row1][col1]
+                    stepDict['time'] = time
+                    time += timeStep
+                    stepDict['images'] = stepArray
+
+                    stepsList.append(copy.deepcopy(stepDict))
+
+        if direction == "lb_conner":
+            if (endRow - startRow) > (endCol - startCol):
+                mostDirection = False
+                print("vertical direction")
+            else:
+                mostDirection = True
+                print("horizontal direction")
+
+            if mostDirection:
+                for col in range(startCol, endCol+1):
+                    for col1 in range(startCol, col+1):
+                        for row1 in range(endRow, endRow - endCol-col-1, -1):
+                            if row1 <= endRow and row1 >= startRow:
+                                stepArray[row1][col1] = nessSlide[row1][col1]
+                    stepDict['time'] = time
+                    time += timeStep
+                    stepDict['images'] = stepArray
+
+                    stepsList.append(copy.deepcopy(stepDict))
+            else:
+                for row in range(endRow, startRow-1, -1):
+                    for row1 in range(endRow, row-1, -1):
+                        for col1 in range((row-endRow) + 1):
+                            if col1 <= endCol and col1 >= startCol:
+                                stepArray[row1][col1] = nessSlide[row1][col1]
+                    stepDict['time'] = time
+                    time += timeStep
+                    stepDict['images'] = stepArray
+
+                    stepsList.append(copy.deepcopy(stepDict))
+        elif direction == "rb_conner":
+            if (endRow - startRow) > (endCol - startCol):
+                mostDirection = False
+                print("vertical direction")
+            else:
+                mostDirection = True
+                print("horizontal direction")
+
+            if mostDirection:
+                for col in range(endCol, startCol-1, -1):
+                    for col1 in range(endCol, col-1, -1):
+                        for row1 in range(endCol, col-1, -1):
+                            if row1 <= endRow and row1 >= startRow:
+                                stepArray[row1][col1] = nessSlide[row1][col1]
+                    stepDict['time'] = time
+                    time += timeStep
+                    stepDict['images'] = stepArray
+
+                    stepsList.append(copy.deepcopy(stepDict))
+            else:
+                for row in range(endRow, startRow-1, -1):
+                    for row1 in range(endRow, row-1, -1):
+                        for col1 in range(endRow, row-1, -1):
                             if col1 <= endCol and col1 >= startCol:
                                 stepArray[row1][col1] = nessSlide[row1][col1]
                     stepDict['time'] = time
