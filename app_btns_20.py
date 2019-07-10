@@ -17,8 +17,8 @@ class Example(QWidget):
 
     def initUI(self):
 
-        self.rows = 3
-        self.cols = 3
+        self.rows = 10
+        self.cols = 25
 
         self.curState = []
         self.nextState = []
