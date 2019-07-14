@@ -121,8 +121,10 @@ class Scenario:
                     anim_type = 'serial'
                 elif anim_type == '5':
                     anim_type = 'noise'
-                else:
+                elif anim_type == '6':
                     anim_type = "check"
+                elif anim_type == '7':
+                    anim_type = 'arrow'
 
                 try:
                     anim_time = data['animation'][0]['time']
@@ -273,6 +275,14 @@ class Scenario:
                                              (maxRow, maxCol))
                 elif self.slides[slideNum]['animation']['type'] == 'check':
                     self.check_animation(self.slides[slideNum-1]['images'],
+                                             self.slides[slideNum]['images'],
+                                             self.slides[slideNum]['timecode'],
+                                             self.slides[slideNum]['animation']['time'],
+                                             self.slides[slideNum]['animation']['direction'],
+                                             (minRow, minCol),
+                                             (maxRow, maxCol))
+                elif self.slides[slideNum]['animation']['type'] == 'arrow':
+                    self.horizontal_arrow(self.slides[slideNum-1]['images'],
                                              self.slides[slideNum]['images'],
                                              self.slides[slideNum]['timecode'],
                                              self.slides[slideNum]['animation']['time'],
@@ -466,6 +476,55 @@ class Scenario:
         print("------------------------------------------")
         for step in stepsList:
             #self.write_data_to_file(self.prepare_serial_data(step['time'], step['images']))
+            print("timing: {}".format(step['time']))
+            for row in step['images']:
+                print(row)
+            print("------------------------------------------")
+
+    def horizontal_arrow(self, prevSlide, nessSlide, startTime, timeStep, direction, startPos, endPos):
+        startRow, startCol = startPos
+        endRow, endCol = endPos
+        time = startTime
+
+        stepsList = []
+        stepDict = {}
+        stepArray = prevSlide[:]
+
+        if (endRow - startRow + 1) % 2 != 0:
+            r1 = startRow + int((endRow - startRow) / 2)
+            r2 = startRow + int((endRow - startRow) / 2)
+        else:
+            r1 = startRow + int((endRow - startRow) / 2)
+            r2 = r1 + 1
+
+        if direction == 'left_right':
+            for step in range(startCol, endCol+int((r1+r2)/2)+1):
+                for col in range(startCol, step+1):
+                    for row in range(step-col+1):
+                        if (startRow <= (r1 - row) <= endRow) and (startCol <= col <= endCol):
+                            stepArray[r1 - row][col] = nessSlide[r1 - row][col]
+                        if (startRow <= (r2 + row) <= endRow) and (startCol <= col <= endCol):
+                            stepArray[r2 + row][col] = nessSlide[r2 + row][col]
+                stepDict['time'] = time
+                time += timeStep
+                stepDict['images'] = stepArray
+                stepsList.append(copy.deepcopy(stepDict))
+        elif direction == 'right_left':
+            for step in range(startCol, endCol+int((r1+r2)/2)+1):
+                for col in range(endCol, endCol-step-1, -1):
+                    for row in range(col - (endCol - step)+1):
+                        if (startRow <= (r1 - row) <= endRow) and (startCol <= col <= endCol):
+                            stepArray[r1 - row][col] = nessSlide[r1 - row][col]
+                        if (startRow <= (r2 + row) <= endRow) and (startCol <= col <= endCol):
+                            stepArray[r2 + row][col] = nessSlide[r2 + row][col]
+                stepDict['time'] = time
+                time += timeStep
+                stepDict['images'] = stepArray
+                stepsList.append(copy.deepcopy(stepDict))
+
+        print("------------------------------------------")
+        for step in stepsList:
+            # self.write_data_to_file(self.prepare_serial_data(step['time'], step['images']))
             print("timing: {}".format(step['time']))
             for row in step['images']:
                 print(row)

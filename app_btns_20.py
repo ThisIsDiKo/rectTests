@@ -1,5 +1,6 @@
 import sys
-from PyQt5.QtWidgets import QWidget, QApplication, QPushButton, QComboBox, QHBoxLayout, QVBoxLayout, QGridLayout, QLineEdit
+from PyQt5.QtWidgets import QWidget, QApplication, QPushButton, QComboBox, QHBoxLayout, QVBoxLayout,\
+    QLabel, QGridLayout, QLineEdit
 from PyQt5.QtGui import QPainter, QColor, QBrush, QIcon
 
 import socket
@@ -99,7 +100,15 @@ class Example(QWidget):
         self.gridL = QGridLayout()
         for i in range(self.rows):
             for j in range(self.cols):
-                self.gridL.addWidget(self.listOfCBox[i][j], i, j)
+                self.gridL.addWidget(self.listOfCBox[i][j], i, j+1)
+
+        for i in range(self.rows):
+            self.gridL.addWidget(QLabel(str(i+1)), i, self.cols+1)
+            self.gridL.addWidget(QLabel(str(i+1)), i, 0)
+
+        for j in range(self.cols):
+            self.gridL.addWidget(QLabel(str(j+1)), self.rows+1, j + 1)
+
 
         #self.vBoxL.addWidget(self.testCBox)
         self.vBoxL.addLayout(self.hBoxL)
