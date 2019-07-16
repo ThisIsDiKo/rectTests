@@ -111,7 +111,9 @@ class Scenario:
             print(animation == "None")
             if animation != "None":
                 anim_type = data['animation'][0]['type']
-                if anim_type == '1':
+                if anim_type == '0':
+                    anim_type = 'None'
+                elif anim_type == '1':
                     anim_type = 'waterfall'
                 elif anim_type == '2':
                     anim_type = 'wave'
@@ -173,14 +175,16 @@ class Scenario:
                 except:
                     print('no parameter direction2')
 
+                if anim_type == 'None':
+                    slide['animation'] = 'None'
+                else:
+                    animation = {}
+                    animation['type'] = anim_type
+                    animation['time'] = anim_time
+                    animation['rounds'] = anim_rounds
+                    animation['direction'] = anim_direction
 
-                animation = {}
-                animation['type'] = anim_type
-                animation['time'] = anim_time
-                animation['rounds'] = anim_rounds
-                animation['direction'] = anim_direction
-
-                slide['animation'] = animation.copy()
+                    slide['animation'] = animation.copy()
             else:
                 slide['animation'] = 'None'
 
@@ -475,7 +479,7 @@ class Scenario:
 
         print("------------------------------------------")
         for step in stepsList:
-            #self.write_data_to_file(self.prepare_serial_data(step['time'], step['images']))
+            self.write_data_to_file(self.prepare_serial_data(step['time'], step['images']))
             print("timing: {}".format(step['time']))
             for row in step['images']:
                 print(row)
@@ -524,7 +528,7 @@ class Scenario:
 
         print("------------------------------------------")
         for step in stepsList:
-            # self.write_data_to_file(self.prepare_serial_data(step['time'], step['images']))
+            self.write_data_to_file(self.prepare_serial_data(step['time'], step['images']))
             print("timing: {}".format(step['time']))
             for row in step['images']:
                 print(row)
