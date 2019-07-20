@@ -332,10 +332,14 @@ class Scenario:
         stepsList = []
         stepDict = {}
         stepArray = prevSlide[:]
+        maxMovement = 0
 
         if direction == "up_down":
             for row in range(startRow, endRow + 1):
                 for col in range(startCol, endCol + 1):
+                    movement = self.slice_movement(stepArray[row][col], nessSlide[row][col])
+                    if movement > maxMovement:
+                        maxMovement = movement
                     stepArray[row][col] = nessSlide[row][col]
 
                 stepDict['time'] = time
@@ -347,6 +351,9 @@ class Scenario:
         elif direction == "down_up":
             for row in range(endRow, startRow-1, - 1):
                 for col in range(startCol, endCol + 1):
+                    movement = self.slice_movement(stepArray[row][col], nessSlide[row][col])
+                    if movement > maxMovement:
+                        maxMovement = movement
                     stepArray[row][col] = nessSlide[row][col]
 
                 stepDict['time'] = time
@@ -357,6 +364,9 @@ class Scenario:
         elif direction == "left_right":
             for col in range(startCol, endCol + 1):
                 for row in range(startRow, endRow + 1):
+                    movement = self.slice_movement(stepArray[row][col], nessSlide[row][col])
+                    if movement > maxMovement:
+                        maxMovement = movement
                     stepArray[row][col] = nessSlide[row][col]
 
                 stepDict['time'] = time
@@ -368,6 +378,9 @@ class Scenario:
         elif direction == "right_left":
             for col in range(endCol, startCol - 1, -1):
                 for row in range(startRow, endRow + 1):
+                    movement = self.slice_movement(stepArray[row][col], nessSlide[row][col])
+                    if movement > maxMovement:
+                        maxMovement = movement
                     stepArray[row][col] = nessSlide[row][col]
 
                 stepDict['time'] = time
@@ -378,12 +391,40 @@ class Scenario:
 
 
         print("------------------------------------------")
+        print("Animation paraments:")
+        print("\tMax movement: {}\n\tSteps: {}".format(maxMovement, len(stepsList)))
+        print("\tAnimationTime: {}".format(maxMovement*0.2 + len(stepsList)*timeStep/1000))
+        lOfData = []
+        data = {}
+        data["id"] = 1
+        data["endTime"] = maxMovement*0.2 + len(stepsList)*timeStep/1000
+        lOfData.append(copy.deepcopy(data))
+        data["id"] = 2
+        data["endTime"] = 15
+        lOfData.append(copy.deepcopy(data))
+        json_data = json.dumps(lOfData)
+        print(json_data)
         for step in stepsList:
             self.write_data_to_file(self.prepare_serial_data(step['time'], step['images']))
             print("timing: {}".format(step['time']))
             for row in step['images']:
                 print(row)
             print("------------------------------------------")
+
+    def slice_movement(self, start, end):
+        if start < 20 and end < 20:
+            if end < start:
+                return 20 - start + end
+            else:
+                return end - start
+        else:
+            modStart = int(start / 20)
+            modEnd = int(end / 20)
+            if modEnd < modStart:
+                return 20 - modStart + modEnd + 20 * (end % 20)
+            else:
+                return modEnd - modStart + 20 * (end % 20)
+
 
     def wave_2_animation(self, prevSlide, nessSlide, startTime, timeStep, direction, startPos, endPos):
         startRow, startCol = startPos
@@ -393,6 +434,7 @@ class Scenario:
         stepsList = []
         stepDict = {}
         stepArray = prevSlide[:]
+        maxMovement = 0
 
         mostDirection = True #for horizontal
 
@@ -401,6 +443,9 @@ class Scenario:
                 for col1 in range(startCol, col + 1):
                     for row1 in range(startRow, startRow + col - col1 + 1):
                         if (startRow <= row1 <= endRow) and (startCol <= col1 <= endCol):
+                            movement = self.slice_movement(stepArray[row1][col1], nessSlide[row1][col1])
+                            if movement > maxMovement:
+                                maxMovement = movement
                             stepArray[row1][col1] = nessSlide[row1][col1]
                 stepDict['time'] = time
                 time += timeStep
@@ -412,6 +457,9 @@ class Scenario:
                 for col1 in range(endCol, col - 1, -1):
                     for row1 in range(startRow, startRow + col1 - col + 1):
                         if (startRow <= row1 <= endRow) and (startCol <= col1 <= endCol):
+                            movement = self.slice_movement(stepArray[row1][col1], nessSlide[row1][col1])
+                            if movement > maxMovement:
+                                maxMovement = movement
                             stepArray[row1][col1] = nessSlide[row1][col1]
                 stepDict['time'] = time
                 time += timeStep
@@ -423,6 +471,9 @@ class Scenario:
                 for col1 in range(startCol, col + 1):
                     for row1 in range(endRow, endRow - col + col1 - 1, -1):
                         if (startRow <= row1 <= endRow) and (startCol <= col1 <= endCol):
+                            movement = self.slice_movement(stepArray[row1][col1], nessSlide[row1][col1])
+                            if movement > maxMovement:
+                                maxMovement = movement
                             stepArray[row1][col1] = nessSlide[row1][col1]
                 stepDict['time'] = time
                 time += timeStep
@@ -434,6 +485,9 @@ class Scenario:
                 for col1 in range(endCol, col - 1, -1):
                     for row1 in range(endRow, endRow - col1 + col - 1, -1):
                         if (startRow <= row1 <= endRow) and (startCol <= col1 <= endCol):
+                            movement = self.slice_movement(stepArray[row1][col1], nessSlide[row1][col1])
+                            if movement > maxMovement:
+                                maxMovement = movement
                             stepArray[row1][col1] = nessSlide[row1][col1]
                 stepDict['time'] = time
                 time += timeStep
@@ -466,6 +520,9 @@ class Scenario:
                 for col in range(c1-step, c2+step+1):
                     for row in range(r1-step, r2+step+1):
                         if (row <= endRow and row >= startRow) and (col <= endCol and col >= startCol):
+                            movement = self.slice_movement(stepArray[row][col], nessSlide[row][col])
+                            if movement > maxMovement:
+                                maxMovement = movement
                             stepArray[row][col] = nessSlide[row][col]
                 stepDict['time'] = time
                 time += timeStep
@@ -474,8 +531,11 @@ class Scenario:
                 stepsList.append(copy.deepcopy(stepDict))
 
         print("------------------------------------------")
+        print("Animation paraments:")
+        print("\tMax movement: {}\n\tSteps: {}".format(maxMovement, len(stepsList)))
+        print("\tAnimationTime: {}".format(maxMovement * 0.2 + len(stepsList) * timeStep / 1000))
         for step in stepsList:
-            #self.write_data_to_file(self.prepare_serial_data(step['time'], step['images']))
+            self.write_data_to_file(self.prepare_serial_data(step['time'], step['images']))
             print("timing: {}".format(step['time']))
             for row in step['images']:
                 print(row)
