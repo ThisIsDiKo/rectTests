@@ -47,7 +47,7 @@ class Scenario:
         self.width = 25
         self.height = 10
 
-        self.callType = 'Simple'
+        self.callType = 'Full'
 
         self.animationTypeDict = {"0": 'None',
                                   "1": 'waterfall',
@@ -164,12 +164,12 @@ class Scenario:
 
     def process_animations(self):
         simpleData = []
+        dataForFile = ""
         for slideNum in range(len(self.slides)):
             data = self.animationFuncDict[self.slides[slideNum].animation['type']](self.slides[slideNum-1],
                                                                                    self.slides[slideNum])
             if self.callType == 'Full':
-                #print(data)
-                pass
+                dataForFile += data
             else:
                 msTime = data['endTime']
                 minuteTime = int(msTime / 60000)
@@ -179,8 +179,13 @@ class Scenario:
                 simpleData.append(data)
 
         if self.callType == 'Full':
-            # print(data)
-            pass
+            dataForFile = dataForFile[:-1]
+            try:
+                self.fileToWrite = open('sc.txt', 'w')
+                self.fileToWrite.write(dataForFile)
+                self.fileToWrite.close()
+            except:
+                self.print_debug("can't open file")
         else:
             json_data = json.dumps(simpleData)
             self.print_response_animation_time(json_data)
