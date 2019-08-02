@@ -27,8 +27,11 @@ class ControlPanel(QWidget):
             self.cols = 25
             self.socketAddr = ("192.168.0.222", 6454)
 
-        with open("styles.css", "r") as fh:
-            self.setStyleSheet(fh.read())
+        try:
+            with open("styles.css", "r") as fh:
+                self.setStyleSheet(fh.read())
+        except:
+            pass
 
         self.sock = None
         self.curSlide = []
@@ -38,6 +41,7 @@ class ControlPanel(QWidget):
         self.gridL = QGridLayout()
 
         self.init_head()
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
         self.setLayout(self.mainLayout)
         self.setWindowTitle("Панель управления календарями")
@@ -150,8 +154,9 @@ class ControlPanel(QWidget):
         hboxAnimation.addWidget(self.cBoxAnimationDirection)
         #hboxAnimation.addWidget(self.btnGenerate)
 
-        t = QLabel("---------------            АНИМАЦИЯ            ---------------")
+        t = QLabel("АНИМАЦИЯ")
         t.setAlignment(Qt.AlignCenter)
+        t.setObjectName("AnimLbl")
         self.mainLayout.addWidget(t)
         self.mainLayout.addLayout(hboxAnimation)
         self.mainLayout.addWidget(self.btnGenerate, alignment=Qt.AlignCenter)
