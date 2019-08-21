@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtWidgets import QWidget, QApplication, QPushButton, QComboBox, QHBoxLayout, QVBoxLayout,\
     QLabel, QGridLayout, QLineEdit, QMessageBox
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 
 import configparser
 import copy
@@ -87,6 +87,9 @@ class ControlPanel(QWidget):
         self.btnSetAll.clicked.connect(self.btnSetAll_clicked)
         self.btnSetAll.setObjectName("SetAll")
 
+        self.btnSetRow = QPushButton('Установить колонки')
+        self.btnSetRow.clicked.connect(self.update_rows)
+
         self.listOfCBox = []
         for i in range(self.rows):
             tL = []
@@ -107,9 +110,18 @@ class ControlPanel(QWidget):
                 self.gridL.addWidget(self.listOfCBox[i][j], i, j + 1)
             self.curSlide.append(t)
 
+        self.listOfRowsBox = []
+        for i in range(self.rows):
+            cBox = QComboBox()
+            cBox.addItems([str(i) for i in range(0, 20)])
+            cBox.setCurrentText("0")
+            cBox.setMaxVisibleItems(20)
+            self.listOfRowsBox.append(cBox)
+
         for i in range(self.rows):
             self.gridL.addWidget(QLabel(str(i + 1)), i, self.cols + 1)
             self.gridL.addWidget(QLabel(str(i + 1)), i, 0)
+            self.gridL.addWidget(self.listOfRowsBox[i], i, self.cols + 2)
 
         for j in range(self.cols):
             self.gridL.addWidget(QLabel(str(j + 1)), self.rows + 1, j + 1)
@@ -124,11 +136,18 @@ class ControlPanel(QWidget):
         hboxSetAll.addWidget(QLabel("Слайд"))
         hboxSetAll.addWidget(self.cBoxNessSlide)
         hboxSetAll.addWidget(self.btnSetAll)
+        hboxSetAll.addWidget(self.btnSetRow)
 
         self.mainLayout.addLayout(hboxSetAll)
         self.mainLayout.addLayout(self.gridL)
         self.mainLayout.addWidget(self.btnSend, alignment=Qt.AlignCenter)
         self.btnUseSettings.setDisabled(True)
+
+    def update_rows(self):
+        for i in range(self.rows):
+            for j in range(self.cols):
+                if self.listOfCBox[i][j].currentText() != "-1":
+                    self.listOfCBox[i][j].setCurrentText(self.listOfRowsBox[i].currentText())
 
     def init_animations(self):
         self.txtAnimationStep = QLineEdit("500")
@@ -166,6 +185,7 @@ class ControlPanel(QWidget):
             for j in range(self.cols):
                 if self.listOfCBox[i][j].currentText() != "-1":
                     self.listOfCBox[i][j].setCurrentText(self.cBoxNessSlide.currentText())
+            self.listOfRowsBox[i].setCurrentText(self.cBoxNessSlide.currentText())
 
     def btnSend_clicked(self):
         data = self.prep_data()
@@ -230,9 +250,9 @@ class ControlPanel(QWidget):
         self.init_animations()
 
     def send_data(self, l):
-        part1 = b'\x41\x72\x74\x2d\x4e\x65\x74\x00\x00\x50\x00\x0e'
-        part2 = b'\x00\x00\x00\x00\x02\x00'
-        part3 = bytes(l)
+        part1 = b'\x41\x72\x74\x2d\x4e\x65\x74\x00\x00\x50\x00\x0e' #первая часть преамбулы
+        part2 = b'\x00\x00\x00\x00\x02\x00' #вторая часть преамбулы
+        part3 = bytes(l)    #Массив данных, для отправки на календари (последовательность байт с позициями)
         data = part1 + part2 + part3
         if self.sock:
             self.sock.sendto(data, self.socketAddr)
