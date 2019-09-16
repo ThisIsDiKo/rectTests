@@ -1,0 +1,68 @@
+QWidget{
+    background-color:gray;
+    font: bold 14px
+}
+QPushButton{
+    background-color: rgb(60, 60, 60);
+    border-style: outset;
+    border-width: 2px;
+    border-radius: 10px;
+    border-color: beige;
+    font: bold 40px;
+    min-width: 10em;
+    padding: 20px;
+}
+
+QPushButton#SetAll{
+    background-color: yellow;
+}
+
+QPushButton#Send{
+    background-color: lightgreen;
+}
+
+QPushButton#Generate{
+    background-color: lightblue;
+}
+
+QPushButton:pressed {
+    background-color: darkgray;
+    border-style: inset;
+}
+
+QLineEdit{
+    background-color: lightgray
+}
+
+
+QComboBox {
+    border: 1px solid lightgray;
+    border-radius: 3px;
+    padding: 1px 1px 1px 3px;
+}
+
+
+
+
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+
+    border-left-width: 1px;
+    border-left-color: darkgray;
+    border-left-style: solid; /* just a single line */
+    border-top-right-radius: 3px; /* same radius as the QComboBox */
+    border-bottom-right-radius: 3px;
+}
+
+QComboBox QAbstractItemView{
+  selection-background-color: darkgray;
+}
+
+QLineEdit#AnimLbl{
+    background-color: rgb(144, 142, 142);
+    border-radius: 10px;
+    font: bold 16px;
+    min-width: 10em;
+    padding: 6px;
+}
